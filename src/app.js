@@ -22,8 +22,7 @@ import { Trello } from "./vendors/trello.js"
 window.Trello = Trello
 
 import "./app.css"
-import { compare_labels, labelsSort, dateSort, magicSort } from './utils';
-
+import { cardLabelsRank, labelsSort, dateSort, oneWeekAway } from './utils';
 
 
 class App extends Component {
@@ -39,7 +38,7 @@ class App extends Component {
 
     // Authorization to fetch data from Trello
     Trello.authorize({
-      name: "Trello Dashboard",
+      name: "Today for Trello",
       type: "redirect",
       interactive: true,
       expiration: "never",
@@ -65,20 +64,25 @@ class App extends Component {
         })
 
         Trello.get(`boards/${b.id}/cards?filter=open`, function(cards) {
-          var cards_to_push = [];
+          var new_cards = [];
           for(let card of cards) {
             // Update fields
             card.board = b.name
             card.idOrganization = b.idOrganization
-            card.labels = _.reverse(_.sortBy(card.labels, compare_labels))
+            card.labels = _.reverse(_.sortBy(card.labels, cardLabelsRank))
             if (card.due !== null)
               card.due = new Date(card.due);
 
-            cards_to_push.push(card)
+            new_cards.push(card)
           }
 
-          cards_to_push = self.state.cards.concat(cards_to_push)
-          self.setState({ cards: cards_to_push.sort(magicSort)})
+          new_cards = self.state.cards.concat(new_cards)
+          var [block_due, block_then] = _.partition(new_cards, oneWeekAway)
+          new_cards = _.concat(
+            _.orderBy(block_due, ['due', cardLabelsRank], ['asc', 'asc']),
+            _.orderBy(block_then, [cardLabelsRank, 'due'], ['asc', 'asc']),
+          )
+          self.setState({ cards: new_cards})
         })
       }
     })
@@ -100,15 +104,7 @@ class App extends Component {
   }
 
   nameFormater(name, row) {
-    return (
-      <div>
-        <p>
-          <strong>
-            <a href={row.url} target="_blank">{name}</a>
-          </strong>
-        </p>
-      </div>
-    )
+    return <strong><a href={row.url} target="_blank">{name}</a></strong>
   }
 
   renderTableNew(cards) {
@@ -170,19 +166,23 @@ class App extends Component {
     return (
       <Container fluid={true}>
         <Sidebar as={Menu} width="thin" visible={true} vertical>
-          <Dropdown trigger={trigger} options={options} icon='angle double down' fluid  className="select-user"
+          <Dropdown trigger={trigger} options={options}
+                    icon='angle double down' fluid className="select-user"
                     onChange={this.handleUserClick()} value={selectedUser.displayName}>
           </Dropdown>
 
-          <Menu.Item key="all" active={selectedOrg === "all"} onClick={this.handleOrgClick("all")}>
+          <Menu.Item key="all" active={selectedOrg === "all"}
+                     onClick={this.handleOrgClick("all")}>
             All organizations
           </Menu.Item>
-          <Menu.Item key="perso" active={selectedOrg === null} onClick={this.handleOrgClick(null)}>
+          <Menu.Item key="perso" active={selectedOrg === null}
+                     onClick={this.handleOrgClick(null)}>
             Personal
           </Menu.Item>
 
           {organizations.map(org => (
-            <Menu.Item key={org.id} active={selectedOrg === org.id} onClick={this.handleOrgClick(org.id)}>
+            <Menu.Item key={org.id} active={selectedOrg === org.id}
+                       onClick={this.handleOrgClick(org.id)}>
               {org.displayName}
             </Menu.Item>
           ))}

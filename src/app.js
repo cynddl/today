@@ -69,7 +69,7 @@ class App extends Component {
             // Update fields
             card.board = b.name
             card.idOrganization = b.idOrganization
-            card.labels = _.reverse(_.sortBy(card.labels, cardLabelsRank))
+            card.labels = _.sortBy(card.labels, cardLabelsRank)
             if (card.due !== null)
               card.due = new Date(card.due);
 

@@ -27,7 +27,7 @@ html, body {
 }
 
 
-/* make sidebar nav vertical */ 
+/* make sidebar nav vertical */
 @media (min-width: 768px) {
   .sidebar-nav .navbar .navbar-collapse {
     padding: 0;
@@ -93,4 +93,14 @@ table.table tbody tr {
 
 table.table tbody td, table.table thead th {
   border: none;
+}
+
+/* Labels take full width of the cell */
+td:nth-child(2) div {
+  display: flex;
+}
+
+.ui.empty.circular.label, .ui.empty.circular.labels .label {
+  border-radius: 0;
+  width: 100%;
 }

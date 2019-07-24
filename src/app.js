@@ -3,7 +3,7 @@
 import React, { Component } from "react"
 import _ from "lodash";
 
-import {Redirect, withRouter, Route, Switch, Link, matchPath} from "react-router-dom";
+import { hot } from 'react-hot-loader'
 
 // jQuery
 import jquery from "jquery";
@@ -14,107 +14,19 @@ import { Trello } from "./vendors/trello.js";
 window.Trello = Trello;
 
 // Semantic UI
-import { Label, Popup, Container, Menu, Segment, Sidebar, Dropdown } from "semantic-ui-react";
+import { Container, Segment } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 
-// Boostrap for BootstrapTable
-import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
-import "react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
-import "bootstrap/dist/css/bootstrap.min.css";
+// Autocompletion
+import { TrelloAutosuggest } from './TrelloAutosuggest'
+
+// Routing
+import Navigo from 'navigo';
 
 import "./app.css";
 
-import {cardLabelsRank, oneWeekAway, dateSort, labelsSort} from "./utils";
-
-import TimeAgo from "react-timeago";
-import { createBrowserHistory } from 'history';
-
-
-const getParams = pathname => {
-    const matchProfile = matchPath(pathname, {
-        path: '/user/:username',
-        exact: true,
-    });
-    return (matchProfile && matchProfile.params) || {};
-};
-
-
-
-class DataRenderer extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    labelsFormatter(labels) {
-        const content = labels.map(l => (
-            <Popup key={l.id} trigger={<Label circular empty color={l.color} key={l.color} />} content={l.name} />
-        ));
-        return <div>{content}</div>
-    }
-
-    dueFormater(due) {
-        return (due === null) ? <p /> : <TimeAgo date={due} />
-    }
-
-    boardFormatter(board, row) {
-        return <a href={`https://trello.com/b/${row.idBoard}`}>{board}</a>
-    }
-
-    nameFormater(name, row) {
-        return <strong><a href={row.url} target="_blank">{name}</a></strong>
-    }
-
-    dueCompleteFormatter(dueComplete) {
-        return <strong>{dueComplete ? "Done": "Remaining"}</strong>
-    }
-
-    handleBackButton () {
-        this.props.history.go('/');
-    }
-
-    componentDidMount () {
-        window.onpopstate = (event) => {
-            event.preventDefault();
-            this.handleBackButton();
-        }
-    }
-
-    render () {
-        let cards = this.props.cards;
-        if (this.props.selectedOrg !== "all")
-            cards = _.filter(cards, c => c.idOrganization === this.props.selectedOrg)
-        if (this.props.selectedUser !== null)
-            cards = _.filter(cards, c => c.idMembers.includes(this.props.selectedUser.id))
-        return (
-            <BootstrapTable data={cards} striped={false} hover={true} bordered={false} multiColumnSort={2}>
-                <TableHeaderColumn autoValue={true} dataField="id" isKey={true} hidden={true}>
-                    Id
-                </TableHeaderColumn>
-                <TableHeaderColumn
-                    width="10%"
-                    dataField="labels"
-                    dataFormat={this.labelsFormatter}
-                    dataSort={true}
-                    sortFunc={labelsSort}>
-                    {" "}
-                    Labels
-                </TableHeaderColumn>
-                <TableHeaderColumn dataField="board" dataSort={true}>
-                    Board
-                </TableHeaderColumn>
-                <TableHeaderColumn dataField="due" dataSort={true} sortFunc={dateSort} dataFormat={this.dueFormater}>
-                    Due date
-                </TableHeaderColumn>
-                <TableHeaderColumn dataField="dueComplete" dataSort={true} dataFormat={this.dueCompleteFormatter}>
-                    Done
-                </TableHeaderColumn>
-                <TableHeaderColumn width="60%" dataFormat={this.nameFormater} dataField="name">
-                    Card
-                </TableHeaderColumn>
-            </BootstrapTable>
-        )
-    }
-}
+import {cardLabelsRank, oneWeekAway} from "./utils";
+import { DataRenderer } from './DataRenderer'
 
 
 class App extends Component {
@@ -125,9 +37,19 @@ class App extends Component {
             organizations: [],
             users: {},
             selectedOrg: "all",
-            selectedUser: {},
-            me: null
+            me: null,
+            route: null
         };
+
+        // Initialize routing
+        this.router = new Navigo(null, true, '#!');
+        this.router
+            .on('/user/:id', (params) => this.selectRoute('user', params.id) )
+            .on('/board/:id', (params) => this.selectRoute('board', params.id) )
+            .on('/org/:id', (params) => this.selectRoute('org', params.id) )
+            .on('*', () => this.selectRoute() )
+            .resolve();
+
 
         // Authorization to fetch data from Trello
         Trello.authorize({
@@ -141,27 +63,18 @@ class App extends Component {
         let self = this;
 
         Trello.get("members/me", function(me) {
-            self.setState({selectedUser: me});
-            self.setState({me: me});
-        });
+            self.setState({route: {category: 'user', id: me.id}});
+        })
 
-        Trello.get("members/me/organizations", function(orgs) {
-            self.setState({organizations: orgs});
-        });
+        Trello.get("members/me/organizations", (orgs) => 
+            self.setState({organizations: orgs})
+        );
 
         Trello.get("members/me/boards?filter=open", function(boards) {
             for(let b of boards) {
                 Trello.get(`boards/${b.id}/members`, function(members) {
                     for(let m of members) {
                         self.state.users[m.id] = m;
-                    }
-                    const pathname = props.location.pathname;
-                    const userParams = getParams(pathname);
-                    if (userParams.username) {
-                        const user = _.find(self.state.users,  u => u.id === userParams.username);
-                        if (user){
-                            self.setState({selectedUser: user});
-                        }
                     }
                 });
 
@@ -170,10 +83,10 @@ class App extends Component {
                     for(let card of cards) {
                         // Update fields
                         card.board = b.name;
+                        card.boardId = b.id;
                         card.idOrganization = b.idOrganization;
                         card.labels = _.sortBy(card.labels, cardLabelsRank);
                         if (card.due !== null)
-
                             card.due = new Date(card.due);
                         new_cards.push(card);
                     }
@@ -189,78 +102,63 @@ class App extends Component {
         });
     }
 
-    handleOrgClick(index) {
-        return () => this.setState({ selectedOrg: index })
+    selectRoute(category, id) {
+        this.setState({route: {category: category, id: id}})
     }
 
-    setUser(userId) {
-        const user = _.find(this.state.users,  u => u.id === userId);
-        if (user){
-            this.setState({selectedUser: user});
-        }
-    }
-
-    handleUserClick() {
-        return (err, event) => {
-            this.setUser(event.value);
-        }
+    onSuggestionSelected(_, e) {
+        this.router.navigate(`#!/${e.suggestion.type}/${e.suggestion.id}`)
     }
 
     render() {
-        const { selectedOrg, selectedUser, organizations, users } = this.state;
+        const { cards, users, organizations } = this.state;
 
         const options = _.map(users, (u, id) => (
-            {key: u.id, text: u.fullName, value: u.id, to: '/user/' + u.id, as: Link}
-        ));
+            {key: u.id, text: u.fullName, value: u.id, to: '/user/' + u.id}
+        )); 
         options.sort(function (a, b) {
             return a.text.localeCompare(b.text);
         });
 
-        const trigger = (
-            <Menu.Item key="user" className="select-user-label">
-                {selectedUser.fullName}
-            </Menu.Item>
-        );
+        const dedupeByProperty = (arr, objKey) =>
+            arr.reduce((acc, curr) =>
+            acc.some(a => a[objKey] === curr[objKey])
+                ? acc
+                : [...acc, curr], [])
+
+        const uniqueUsers = _.map(users, (u, id) => ({name: u.fullName, type: 'user', id: u.id}))
+        const uniqueBoards = dedupeByProperty(
+            _.map(cards, (c, id) => ({name: c.board, type: 'board', id: c.boardId})),
+            'id')
+        const uniqueOrgs = dedupeByProperty(
+            _.map(organizations, (o, id) => ({name: o.displayName, type: 'org', id: o.id})),
+            'id')
+
+        const suggestions = [
+            { title: 'Users', options: uniqueUsers },
+            { title: 'Organizations', options: uniqueOrgs },
+            { title: 'Boards', options: uniqueBoards }
+        ]
+
+        let _cards = cards
+        if(this.state.route && this.state.route.category == 'user')
+            _cards = this.state.cards.filter((c) => c.idMembers.includes(this.state.route.id))
+        else if(this.state.route && this.state.route.category == 'board')
+            _cards = this.state.cards.filter((c) => c.boardId == this.state.route.id)
+        else if(this.state.route && this.state.route.category == 'org')
+            _cards = this.state.cards.filter((c) => c.idOrganization == this.state.route.id)
+
         return (
             <Container fluid={true}>
-                <Sidebar as={Menu} width="thin" visible={true} vertical>
-                    <Dropdown trigger={trigger} options={options}
-                              icon='angle double down' fluid className="select-user"
-                              value={selectedUser.displayName} onChange={this.handleUserClick()}>
-                    </Dropdown>
-
-                    <Menu.Item key="all" active={selectedOrg === "all"}
-                               onClick={this.handleOrgClick("all")}>
-                        All organizations
-                    </Menu.Item>
-                    <Menu.Item key="perso" active={selectedOrg == null}
-                               onClick={this.handleOrgClick(null)}>
-                        Personal
-                    </Menu.Item>
-
-                    {organizations.map(org => (
-                        <Menu.Item key={org.id} active={selectedOrg === org.id}
-                                   onClick={this.handleOrgClick(org.id)}>
-                            {org.displayName}
-                        </Menu.Item>
-                    ))}
-                </Sidebar>
-                <Sidebar.Pusher>
                     <Segment basic>
-                        {_.map(users, (u, id) => (
-                            <Route exact key={u.id} path={`/user/${u.id}`} render={(props) => (
-                                <DataRenderer cards={this.state.cards} selectedOrg={selectedOrg}
-                                              selectedUser={u} {...props}/>)}/>))}
-                        {this.state.me ?
-                            <Route exact path="/" render={(props) => (
-                                <DataRenderer cards={this.state.cards} selectedOrg={selectedOrg}
-                                              selectedUser={this.state.me} {...props}/>)}/>
-                            : <div></div>}
+                        <TrelloAutosuggest trelloOptions={suggestions} onSuggestionSelected={this.onSuggestionSelected.bind(this)} />
                     </Segment>
-                </Sidebar.Pusher>
+                    <Segment basic>
+                        <DataRenderer cards={_cards} {...this.props} />
+                    </Segment>
             </Container>
         )
     }
 }
 
-export default withRouter(App);
+export default hot(module)(App);

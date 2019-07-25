@@ -4,29 +4,29 @@
   "version": "0.2.0",
   "repository": "https://github.com/cynddl/today",
   "dependencies": {
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "bootstrap": "^4.3.1",
-    "fuse": "^0.4.0",
-    "jquery": "^3.4.1",
-    "lodash": "^4.17.15",
-    "navigo": "^7.1.2",
-    "react": "^16.8.6",
-    "react-autosuggest": "^9.4.3",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
+    "bootstrap": "4.3.1",
+    "fuse": "0.4.0",
+    "jquery": "3.4.1",
+    "lodash": "4.17.15",
+    "navigo": "7.1.2",
+    "react": "16.8.6",
+    "react-autosuggest": "9.4.3",
     "react-bootstrap-table": "4.3.1",
-    "react-dom": "^16.8.6",
+    "react-dom": "16.8.6",
     "react-timeago": "4.1.9",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.87.3"
+    "semantic-ui-css": "2.4.1",
+    "semantic-ui-react": "0.87.3"
   },
   "scripts": {
     "dev": "parcel ./src/index.html",
     "build": "parcel build ./src/index.html --public-url ./"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
+    "babel-core": "6.26.3",
     "babel-preset-env": "1.7.0",
     "babel-preset-react": "6.24.1",
-    "parcel-bundler": "^1.12.3",
-    "react-hot-loader": "^4.12.9"
+    "parcel-bundler": "1.12.3",
+    "react-hot-loader": "4.12.9"
   }
 }

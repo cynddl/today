@@ -23,14 +23,14 @@ html, body {
 }
 
 .react-autosuggest__input {
-  width: 240px;
+  width: 100%;
   height: 30px;
-  padding: 10px 20px;
+  padding: 20px 10px;
+  margin: 0.5em 0;
   font-family: Helvetica, sans-serif;
   font-weight: 300;
-  font-size: 16px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
+  font-size: 2em;
+  border: none;
 }
 
 .react-autosuggest__input--focused {
@@ -49,7 +49,7 @@ html, body {
 .react-autosuggest__suggestions-container--open {
   display: block;
   position: absolute;
-  top: 51px;
+  top: 61px;
   width: 280px;
   border: 1px solid #aaa;
   background-color: #fff;
@@ -144,4 +144,11 @@ td:nth-child(2) div {
 .ui.empty.circular.label, .ui.empty.circular.labels .label {
   border-radius: 0;
   width: 100%;
+}
+
+
+.card__done {
+  text-decoration: line-through;
+  color: #aaa;
+  font-weight: 300;
 }

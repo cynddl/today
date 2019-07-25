@@ -34,11 +34,7 @@ export class DataRenderer extends Component {
     }
 
     nameFormater(name, row) {
-        return <strong><a href={row.url} target="_blank">{name}</a></strong>
-    }
-
-    dueCompleteFormatter(dueComplete) {
-        return <strong>{dueComplete ? "Done": "Remaining"}</strong>
+        return <strong><a href={row.url} className={row.dueComplete ? "card__done" : ""} target="_blank">{name}</a></strong>
     }
 
     render () {
@@ -63,9 +59,6 @@ export class DataRenderer extends Component {
                 </TableHeaderColumn>
                 <TableHeaderColumn dataField="due" dataSort={true} sortFunc={dateSort} dataFormat={this.dueFormater}>
                     Due date
-                </TableHeaderColumn>
-                <TableHeaderColumn dataField="dueComplete" dataSort={true} dataFormat={this.dueCompleteFormatter}>
-                    Done
                 </TableHeaderColumn>
                 <TableHeaderColumn width="60%" dataFormat={this.nameFormater} dataField="name">
                     Card

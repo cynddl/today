@@ -60,7 +60,7 @@ export class TrelloAutosuggest extends Component {
     render() {
       const { value, suggestions } = this.state;
       const inputProps = {
-        placeholder: "User, board, organisation",
+        placeholder: "Type: user, board, organisation",
         value,
         onChange: this.onChange.bind(this)
       };

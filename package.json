@@ -4,7 +4,6 @@
   "version": "0.2.0",
   "repository": "https://github.com/cynddl/today",
   "dependencies": {
-    "autosuggest-highlight": "^3.1.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "bootstrap": "^4.3.1",
     "fuse": "^0.4.0",
@@ -14,10 +13,10 @@
     "react": "^16.8.6",
     "react-autosuggest": "^9.4.3",
     "react-bootstrap-table": "4.3.1",
-    "react-dom": "16.4.1",
+    "react-dom": "^16.8.6",
     "react-timeago": "4.1.9",
-    "semantic-ui-css": "2.3.3",
-    "semantic-ui-react": "0.82.1"
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.87.3"
   },
   "scripts": {
     "dev": "parcel ./src/index.html",

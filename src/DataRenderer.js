@@ -34,7 +34,11 @@ export class DataRenderer extends Component {
     }
 
     nameFormater(name, row) {
-        return <strong><a href={row.url} className={row.dueComplete ? "card__done" : ""} target="_blank">{name}</a></strong>
+        return <strong>
+            <a href={row.url} className={row.dueComplete ? "card__done" : ""} target="_blank" rel="noopener noreferrer">
+                {name}
+            </a>
+        </strong>
     }
 
     render () {

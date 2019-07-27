@@ -20,12 +20,18 @@
   },
   "scripts": {
     "dev": "parcel ./src/index.html",
+    "eslint": "eslint src",
     "build": "parcel build ./src/index.html --public-url ./"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-preset-env": "1.7.0",
     "babel-preset-react": "6.24.1",
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb": "^17.1.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-you-dont-need-lodash-underscore": "^6.5.0",
     "parcel-bundler": "^1.12.3",
     "react-hot-loader": "^4.12.9"
   }

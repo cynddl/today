@@ -1,5 +1,3 @@
-/* eslint-disable import/first */
-
 import React, { Component } from "react"
 import _ from "lodash"
 
@@ -120,12 +118,6 @@ class App extends Component {
             {key: u.id, text: u.fullName, value: u.id, to: '/user/' + u.id}
         )) 
         options.sort((a, b) => a.text.localeCompare(b.text))
-
-        const dedupeByProperty = (arr, objKey) =>
-            arr.reduce((acc, curr) =>
-            acc.some(a => a[objKey] === curr[objKey])
-                ? acc
-                : [...acc, curr], [])
 
         const uniqueUsers = _.map(users, (u) => ({name: u.fullName, type: 'user', id: u.id}))
         const uniqueBoards = _.map(boards, (b) => ({name: b.name, type: 'board', id: b.id}))

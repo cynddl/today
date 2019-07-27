@@ -16,9 +16,9 @@ export class TrelloAutosuggest extends Component {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
-      if(nextProps.value != this.state.value) {
-        this.setState({value: nextProps.value})
+    componentDidUpdate(prevProps) {
+      if(prevProps.value != this.props.value) {
+        this.setState({value: this.props.value})
       }
     }
   

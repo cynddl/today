@@ -13,15 +13,16 @@ window.Trello = Trello
 
 // Semantic UI
 import { Container, Segment } from "semantic-ui-react"
-import "semantic-ui-css/semantic.min.css"
 
 // Routing
 import Navigo from 'navigo'
 
-import "./app.css"
 import {cardLabelsRank, oneWeekAway} from "./utils"
 import { TrelloAutosuggest } from './TrelloAutosuggest'
 import { DataRenderer } from './DataRenderer'
+
+import "./app.css"
+import "semantic-ui-css/semantic.min.css"
 
 class App extends Component {
     constructor(props) {

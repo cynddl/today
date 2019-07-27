@@ -14,7 +14,13 @@ export class TrelloAutosuggest extends Component {
         value: this.props.value,
         suggestions: []
       }
+
+      this.onInputClearRequested = this.onInputClearRequested.bind(this)
+      this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this)
+      this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this)
+      this.onChange = this.onChange.bind(this)
     }
+    
 
     componentDidUpdate(prevProps) {
       if(prevProps.value != this.props.value) {
@@ -32,6 +38,10 @@ export class TrelloAutosuggest extends Component {
   
     onSuggestionsClearRequested() {
       this.setState({ suggestions: [] })
+    }
+
+   onInputClearRequested() {
+      this.setState({ value: '' })
     }
 
     getSuggestions(value) {
@@ -64,26 +74,31 @@ export class TrelloAutosuggest extends Component {
     }
   
     render() {
-      const { value, suggestions } = this.state;
+      const { value, suggestions } = this.state
       const inputProps = {
         placeholder: "Type: user, board, organisation",
         value,
-        onChange: this.onChange.bind(this)
-      };
+        onChange: this.onChange
+      }
+
+      let clearButton
+      if (value.length >= 1)
+        clearButton = <button className="close-icon" onClick={this.onInputClearRequested}>&times;</button>
   
-      return (
-        <Autosuggest 
-          suggestions={suggestions}
-          multiSection={true}
-          onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(this)}
-          onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(this)}
-          getSuggestionValue={this.getSuggestionValue}
-          getSectionSuggestions={this.getSectionSuggestions}
-          renderSuggestion={this.renderSuggestion}
-          renderSectionTitle={this.renderSectionTitle}
-          inputProps={inputProps}
-          onSuggestionSelected={this.props.onSuggestionSelected}
-        />
-      )
+      return (<div className="search-container">
+          <Autosuggest 
+            suggestions={suggestions}
+            multiSection={true}
+            onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+            onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+            getSuggestionValue={this.getSuggestionValue}
+            getSectionSuggestions={this.getSectionSuggestions}
+            renderSuggestion={this.renderSuggestion}
+            renderSectionTitle={this.renderSectionTitle}
+            inputProps={inputProps}
+            onSuggestionSelected={this.props.onSuggestionSelected}
+          />
+          {clearButton}
+        </div>)
     }
 }

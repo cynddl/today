@@ -11,8 +11,14 @@ export class TrelloAutosuggest extends Component {
       super(props);
   
       this.state = {
-        value: '',
+        value: this.props.value,
         suggestions: []
+      }
+    }
+
+    componentWillReceiveProps(nextProps) {
+      if(nextProps.value != this.state.value) {
+        this.setState({value: nextProps.value})
       }
     }
   
@@ -76,7 +82,6 @@ export class TrelloAutosuggest extends Component {
           renderSuggestion={this.renderSuggestion}
           renderSectionTitle={this.renderSectionTitle}
           inputProps={inputProps}
-
           onSuggestionSelected={this.props.onSuggestionSelected}
         />
       )

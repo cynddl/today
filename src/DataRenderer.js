@@ -20,7 +20,7 @@ export class DataRenderer extends Component {
 
     labelsFormatter(labels) {
         const content = labels.map(l => (
-            <Popup key={l.id} trigger={<Label circular empty color={l.color} key={l.color} />} content={l.name} />
+            <Popup key={l.id} trigger={<Label circular empty color={l.color == "sky" ? "blue" : l.color} key={l.color} />} content={l.name} />
         ));
         return <div>{content}</div>
     }
@@ -39,6 +39,10 @@ export class DataRenderer extends Component {
                 {name}
             </a>
         </strong>
+    }
+
+    usersFormatter (users, row) {
+        return users
     }
 
     render () {
@@ -63,6 +67,9 @@ export class DataRenderer extends Component {
                 </TableHeaderColumn>
                 <TableHeaderColumn dataField="due" dataSort={true} sortFunc={dateSort} dataFormat={this.dueFormater}>
                     Due date
+                </TableHeaderColumn>
+                <TableHeaderColumn dataSort={true} dataFormat={this.usersFormatter} dataField="users">
+                    Users
                 </TableHeaderColumn>
                 <TableHeaderColumn width="60%" dataFormat={this.nameFormater} dataField="name">
                     Card

@@ -32,6 +32,8 @@ class App extends Component {
             organizations: {},
             boards: {},
             users: {},
+            lists: {},
+
             selectedName: "",
             me: null,
             route: null
@@ -52,7 +54,7 @@ class App extends Component {
 
         // Fetch all cards, users, organizations from Trello
         let self = this
-        const urls = ["/members/me", "/members/me/organizations", "/members/me/boards%3Ffilter=open&lists=open"]
+        const urls = ["/members/me", "/members/me/organizations", "/members/me/boards%3Ffilter=open%26lists=open"]
         Trello.get(`batch?urls=${urls.join()}`).then(function(data){
             const [ {200: me}, {200: orgs}, {200: boards} ] = data
             self.setState({ organizations: _.keyBy(orgs, 'id'), boards: _.keyBy(boards, 'id') })
@@ -63,10 +65,10 @@ class App extends Component {
 
             Trello.get(`batch?urls=${boardsMembersURLs.join()}`).then(function(data) {
                 let allMembers = _.unionBy(...(data.map((d) => d[200])), 'id')
-                allMembers = _.map(allMembers, function (key) {
-                    key.abbr = key.fullName.replace(/[^A-Z]/g, "")
-                    return key
-                })
+                allMembers = _.map(
+                    allMembers,
+                    (key) => ({...key, abbr: key.fullName.replace(/[^A-Z]/g, "")})
+                )
                 self.setState({users: _.keyBy(allMembers, 'id')})
 
                 Trello.get(`batch?urls=${boardsListsURLs.join()}`).then(function(data) {
@@ -76,26 +78,27 @@ class App extends Component {
                     Trello.get(`batch?urls=${boardsCardsURLs.join()}`).then(function(data) {
                         let allCards = _.flatten(data.map((d) => d[200]))
                         allCards = allCards.map((card) => ({
-                            ...card, board: self.state.boards[card.idBoard].name,
-                            labels: _.sortBy(card.labels, cardLabelsRank), due: card.due ? new Date(card.due) : null}))
-                        allCards = _.map(allCards, function (card) {
-                            card.users = _.map(card.idMembers, function (id) {return self.state.users[id].abbr}).join(", ")
-                            return card
-                        })
+                            ...card,
+                            board: self.state.boards[card.idBoard].name,
+                            users: _.map(card.idMembers, function (id) {return self.state.users[id].abbr}).join(", "),
+                            labels: _.sortBy(card.labels, cardLabelsRank), due: card.due ? new Date(card.due) : null
+                        }))
+
                         let [block_due, block_then] = _.partition(allCards, oneWeekAway)
                         allCards = _.concat(
                             _.orderBy(block_due, ['due', cardLabelsRank], ['asc', 'asc']),
                             _.orderBy(block_then, [cardLabelsRank, 'due'], ['asc', 'asc']),
-                            )
+                        )
+
                         allCards = allCards.filter((c) => c.idList in self.state.lists);
                         self.setState({ cards: allCards})
                     }).then(() =>
                         self.router
-                        .on('/user/:id', (params) => self.selectRoute('user', params.id) )
-                        .on('/board/:id', (params) => self.selectRoute('board', params.id) )
-                        .on('/org/:id', (params) => self.selectRoute('org', params.id) )
-                        .on('*', () => self.router.navigate(`/user/${me.id}`) )
-                        .resolve()
+                            .on('/user/:id', (params) => self.selectRoute('user', params.id) )
+                            .on('/board/:id', (params) => self.selectRoute('board', params.id) )
+                            .on('/org/:id', (params) => self.selectRoute('org', params.id) )
+                            .on('*', () => self.router.navigate(`/user/${me.id}`) )
+                            .resolve()
                     )
                 })
             })
@@ -113,9 +116,9 @@ class App extends Component {
         this.setState({route: {category: category, id: id}})
         try {
             let selectedName =
-            ((category == 'user') && this.state.users[id].fullName) ||
-            ((category == 'board') && this.state.boards[id].name) ||
-            ((category == 'org') && this.state.organizations[id].displayName)
+                ((category == 'user') && this.state.users[id].fullName) ||
+                ((category == 'board') && this.state.boards[id].name) ||
+                ((category == 'org') && this.state.organizations[id].displayName)
             this.setState({selectedName: selectedName})
             this.updateWindowTitle()
         } catch (error) { }
@@ -130,7 +133,7 @@ class App extends Component {
 
         const options = _.map(users, (u) => (
             {key: u.id, text: u.fullName, value: u.id, to: '/user/' + u.id}
-            ))
+        ))
         options.sort((a, b) => a.text.localeCompare(b.text))
 
         const uniqueUsers = _.map(users, (u) => ({name: u.fullName, type: 'user', id: u.id}))
@@ -138,9 +141,9 @@ class App extends Component {
         const uniqueOrgs =  _.map(organizations, (o) => ({name: o.displayName, type: 'org', id: o.id}))
 
         const suggestions = [
-        { title: 'Users', options: uniqueUsers },
-        { title: 'Organizations', options: uniqueOrgs },
-        { title: 'Boards', options: uniqueBoards }
+            { title: 'Users', options: uniqueUsers },
+            { title: 'Organizations', options: uniqueOrgs },
+            { title: 'Boards', options: uniqueBoards }
         ]
 
         let _cards = cards
@@ -155,7 +158,7 @@ class App extends Component {
                 <Segment basic>
                     <TrelloAutosuggest trelloOptions={suggestions}
                         onSuggestionSelected={this.onSuggestionSelected.bind(this)}
-                        value={this.state.selectedName}/>
+                        value={this.state.selectedName} />
                 </Segment>
                 <Segment basic>
                     <DataRenderer cards={_cards} {...this.props} />

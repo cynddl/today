@@ -41,10 +41,6 @@ export class DataRenderer extends Component {
         </strong>
     }
 
-    usersFormatter (users, row) {
-        return users
-    }
-
     render () {
         let cards = this.props.cards;
 
@@ -68,7 +64,7 @@ export class DataRenderer extends Component {
                 <TableHeaderColumn dataField="due" dataSort={true} sortFunc={dateSort} dataFormat={this.dueFormater}>
                     Due date
                 </TableHeaderColumn>
-                <TableHeaderColumn dataSort={true} dataFormat={this.usersFormatter} dataField="users">
+                <TableHeaderColumn dataSort={true} dataField="users">
                     Users
                 </TableHeaderColumn>
                 <TableHeaderColumn width="60%" dataFormat={this.nameFormater} dataField="name">

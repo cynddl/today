@@ -21,7 +21,8 @@
   "scripts": {
     "dev": "parcel ./src/index.html",
     "eslint": "eslint src",
-    "build": "parcel build ./src/index.html --public-url ./"
+    "build": "parcel build ./src/index.html --public-url ./",
+    "deploy": "subpath-as-branch -p dist -b gh-pages"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -33,6 +34,7 @@
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-you-dont-need-lodash-underscore": "^6.5.0",
     "parcel-bundler": "^1.12.3",
-    "react-hot-loader": "^4.12.9"
+    "react-hot-loader": "^4.12.9",
+    "subpath-as-branch": "^1.0.0"
   }
 }

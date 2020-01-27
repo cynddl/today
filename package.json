@@ -19,7 +19,7 @@
     "semantic-ui-react": "^0.87.3"
   },
   "scripts": {
-    "dev": "parcel ./src/index.html",
+    "dev": "parcel --https ./src/index.html",
     "eslint": "eslint src",
     "build": "parcel build ./src/index.html --public-url ./",
     "deploy": "subpath-as-branch -p dist -b gh-pages"

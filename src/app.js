@@ -52,11 +52,24 @@ class App extends Component {
             expiration: "never",
         })
 
+        function abbrUsername(fullName) {
+            const splittingPattern = /[^a-zA-Z]/g
+
+            let abbr = fullName.split(splittingPattern).map(x => x.charAt(0)).join('').substr(0, 2).toUpperCase()
+            if (abbr.length < 2)
+                abbr = fullName.replace(splittingPattern, '').substr(0, 2).toUpperCase()            
+            if (abbr.length === 0)
+                abbr = "??"
+
+            return abbr
+        }
+
         // Fetch all cards, users, organizations from Trello
         let self = this
         const urls = ["/members/me", "/members/me/organizations", "/members/me/boards%3Ffilter=open%26lists=open"]
         Trello.get(`batch?urls=${urls.join()}`).then(function(data){
             const [ {200: me}, {200: orgs}, {200: boards} ] = data
+
             self.setState({ organizations: _.keyBy(orgs, 'id'), boards: _.keyBy(boards, 'id') })
 
             const boardsMembersURLs = boards.map((b) => `/boards/${b.id}/members`)
@@ -65,9 +78,10 @@ class App extends Component {
 
             Trello.get(`batch?urls=${boardsMembersURLs.join()}`).then(function(data) {
                 let allMembers = _.unionBy(...(data.map((d) => d[200])), 'id')
+
                 allMembers = _.map(
                     allMembers,
-                    (key) => ({...key, abbr: key.fullName.replace(/[^A-Z]/g, "")})
+                    (key) => ({...key, abbr: abbrUsername(key.fullName)})
                 )
                 self.setState({users: _.keyBy(allMembers, 'id')})
 

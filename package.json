@@ -14,9 +14,9 @@
     "react-autosuggest": "^9.4.3",
     "react-bootstrap-table": "4.3.1",
     "react-dom": "^16.8.6",
-    "react-timeago": "4.1.9",
+    "react-timeago": "4.4.0",
     "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.87.3"
+    "semantic-ui-react": "^0.88.2"
   },
   "scripts": {
     "dev": "parcel --https ./src/index.html",
@@ -28,11 +28,11 @@
     "babel-core": "^6.26.3",
     "babel-preset-env": "1.7.0",
     "babel-preset-react": "6.24.1",
-    "eslint": "^6.1.0",
-    "eslint-config-airbnb": "^17.1.1",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-you-dont-need-lodash-underscore": "^6.5.0",
+    "eslint": "^7.3.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-you-dont-need-lodash-underscore": "^6.10.0",
     "parcel-bundler": "^1.12.3",
     "react-hot-loader": "^4.12.9",
     "subpath-as-branch": "^1.0.0"

@@ -10,7 +10,15 @@ import "semantic-ui-css/semantic.min.css";
 import TimeAgo from "react-timeago";
 import React, {Component} from 'react'
 
-import {dateSort, labelsSort} from "./utils";
+import {compareCardsByDate, compareCardsByLabel} from "./utils";
+
+
+function fixColorSUI(color) {
+     if (color == "sky") return "teal"
+     if (color == "lime") return "olive"
+
+     return color
+}
 
 
 export class DataRenderer extends Component {
@@ -20,7 +28,7 @@ export class DataRenderer extends Component {
 
     labelsFormatter(labels) {
         const content = labels.map(l => (
-            <Popup key={l.id} trigger={<Label circular empty color={l.color == "sky" ? "blue" : l.color} key={l.color} />} content={l.name} />
+            <Popup key={l.id} trigger={<Label circular empty color={fixColorSUI(l.color)} key={l.color} />} content={l.name} />
         ));
         return <div>{content}</div>
     }
@@ -54,14 +62,14 @@ export class DataRenderer extends Component {
                     dataField="labels"
                     dataFormat={this.labelsFormatter}
                     dataSort={true}
-                    sortFunc={labelsSort}>
+                    sortFunc={compareCardsByLabel}>
                     {" "}
                     Labels
                 </TableHeaderColumn>
                 <TableHeaderColumn dataField="board" dataSort={true}>
                     Board
                 </TableHeaderColumn>
-                <TableHeaderColumn dataField="due" dataSort={true} sortFunc={dateSort} dataFormat={this.dueFormater}>
+                <TableHeaderColumn dataField="due" dataSort={true} sortFunc={compareCardsByDate} dataFormat={this.dueFormater}>
                     Due date
                 </TableHeaderColumn>
                 <TableHeaderColumn dataSort={true} dataField="users">

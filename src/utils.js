@@ -1,8 +1,8 @@
 import _ from "lodash"
-export { cardLabelsRank, labelsSort, nullSort, dateSort, oneWeekAway }
+export { cardLabelsRank, sortLabels, compareCardsByLabel, compareCardsByDate, oneWeekAway }
 
 const COLORS = [
-  "red", "orange", "yellow", "green", "blue", "purple", "sky", "lime", "black"
+  "green", "yellow", "orange", "red", "purple", "blue", "sky", "lime", "pink", "black", "grey"
 ]
 
 const NOW = new Date();
@@ -12,8 +12,12 @@ function cardLabelsRank(c) {
   return _(c.labels).map((l) => _.indexOf(COLORS, l.color)).min()
 }
 
+function sortLabels(labels) {
+  return _.sortBy(labels, (a) => _.indexOf(COLORS, a.color))
+}
 
-function labelsSort(c1, c2, order) {
+
+function compareCardsByLabel(c1, c2, order) {
   const comp = cardLabelsRank(c1) - cardLabelsRank(c2)
   return order === "desc" ? comp : -comp
 }
@@ -28,7 +32,7 @@ function nullSort(a, b, order) {
 }
 
 
-function dateSort(a, b, order) {
+function compareCardsByDate(a, b, order) {
   return nullSort(a.due, b.due, order)
 }
 

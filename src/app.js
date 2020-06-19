@@ -17,7 +17,7 @@ import { Container, Segment } from "semantic-ui-react"
 // Routing
 import Navigo from 'navigo'
 
-import {cardLabelsRank, oneWeekAway} from "./utils"
+import {cardLabelsRank, oneWeekAway, sortLabels} from "./utils"
 import { TrelloAutosuggest } from './TrelloAutosuggest'
 import { DataRenderer } from './DataRenderer'
 
@@ -95,7 +95,8 @@ class App extends Component {
                             ...card,
                             board: self.state.boards[card.idBoard].name,
                             users: _.map(card.idMembers, function (id) {return self.state.users[id].abbr}).join(", "),
-                            labels: _.sortBy(card.labels, cardLabelsRank), due: card.due ? new Date(card.due) : null
+                            labels: sortLabels(card.labels),
+                            due: card.due ? new Date(card.due) : null
                         }))
 
                         let [block_due, block_then] = _.partition(allCards, oneWeekAway)

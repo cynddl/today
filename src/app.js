@@ -99,11 +99,8 @@ class App extends Component {
                             due: card.due ? new Date(card.due) : null
                         }))
 
-                        let [block_due, block_then] = _.partition(allCards, oneWeekAway)
-                        allCards = _.concat(
-                            _.orderBy(block_due, ['due', cardLabelsRank], ['asc', 'asc']),
-                            _.orderBy(block_then, [cardLabelsRank, 'due'], ['asc', 'asc']),
-                        )
+                        allCards = _.orderBy(allCards, ['dueComplete', 'due', cardLabelsRank], ['asc', 'asc', 'asc'])
+                        console.log(allCards)
 
                         allCards = allCards.filter((c) => c.idList in self.state.lists);
                         self.setState({ cards: allCards})

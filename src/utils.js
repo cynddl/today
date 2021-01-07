@@ -2,7 +2,7 @@ import _ from "lodash"
 export { cardLabelsRank, sortLabels, compareCardsByLabel, compareCardsByDate, oneWeekAway }
 
 const COLORS = [
-  "green", "yellow", "orange", "red", "purple", "blue", "sky", "lime", "pink", "black", "grey"
+  "green", "yellow", "orange", "red", "purple", "blue", "sky", "lime", "pink", "black", "grey", null
 ]
 
 const NOW = new Date();
